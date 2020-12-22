@@ -1,75 +1,43 @@
 import Vue from 'vue'
-import VueRouter from 'vue-router';
-import axios from 'axios';
-import ElementUI from 'element-ui';
-import 'element-ui/lib/theme-chalk/index.css';
 
-import App from './App.vue'
+//import 'normalize.css/normalize.css' // A modern alternative to CSS resets
 
-import Login from './views/login/login.vue'
-import HomePage from './views/HomePage.vue'
+import ElementUI from 'element-ui'
+import 'element-ui/lib/theme-chalk/index.css'
+import locale from 'element-ui/lib/locale/lang/en' // lang i18n
 
-import Index from './views/index/index';
-import Novel from './views/index/novel.vue';
+import '@/styles/index.scss' // global css
 
-import Mock from './mock/mock';
+import App from './App'
+import store from './store'
+import router from './router'
 
-Mock.mockData();
-Vue.use(VueRouter); // 安装路由功能
-/* eslint-disable no-new */
-Vue.use(VueRouter);
-Vue.prototype.$http = axios;
-Vue.use(ElementUI);
+import '@/icons' // icon
+import '@/permission' // permission control
+
+/**
+ * If you don't want to use mock-server
+ * you want to use MockJs for mock api
+ * you can execute: mockXHR()
+ *
+ * Currently MockJs will be used in the production environment,
+ * please remove it before going online ! ! !
+ */
+if (process.env.NODE_ENV === 'development') {
+  const { mockXHR } = require('../mock')
+  mockXHR()
+}
+
+// set ElementUI lang to EN
+//Vue.use(ElementUI, { locale })
+// 如果想要中文版 element-ui，按如下方式声明
+ Vue.use(ElementUI)
 
 Vue.config.productionTip = false
 
-// Vue.http.interceptors.push((request, next) => {
-//   request.credentials = true;
-//   next((response) => {
-//     let messageHeader;
-//     /* global IS_PRODUCTION:true */
-//     if (IS_PRODUCTION) {
-//       messageHeader = "X-Auth-Token";
-//     } else {
-//       messageHeader = "x-auth-token";
-//     }
-//     if (messageHeader in response.headers.map) {
-//       router.push({path: '/login'});
-//     }
-//     return response
-//   });
-// });
-
-
-let routes = [{
-    path: '/login',
-    component: Login
-  },
-  {
-    path: '/',
-    redirect: '/login'
-  },
-  {
-    path: '/homepage',
-    component: HomePage,
-    children: [{
-        path: '/index',
-        component: Index,
-      },
-      {
-        path: '/novel',
-        component: Novel,
-      }
-    ]
-  }
-];
-let router = new VueRouter({
-  // 'mode': 'history', 去掉URL的#号，需要配置服务器http://router.vuejs.org/zh-cn/essentials/history-mode.html
-  'linkActiveClass': 'active',
-  routes
-});
-
 new Vue({
+  el: '#app',
   router,
+  store,
   render: h => h(App)
-}).$mount('#app')
+})
